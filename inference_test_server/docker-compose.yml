@@ -1,0 +1,265 @@
+# version: '3.10'
+
+services:
+  vllmapiserver-mix-exp:
+    image: llm-server:vllm4-by-wxj
+    command: python /main/api/server.py
+    # ulimits:
+    #   stack: 67108864
+    #   memlock: -1
+    environment:
+      - PORT=5000
+      - CUDA_VISIBLE_DEVICES=0
+      - MODEL_NAME=triage-mix-exp
+      - MODEL_PATH=/model_list/area_format_v10MED_s60000-int4
+      - GPU_MEMORY_UTILIZATION=0.9
+      - TENSOR_PARALLEL_SIZE=1
+      - PYTHONPATH=$PYTHONPATH:/workspace/libs
+      - KG_BASE_PATH=/RAG_RES
+      - DEFAULT_RAG=NO
+    volumes:
+      - ${ROOTPATH}/common-exp-api:/main/api
+      # - /mnt/disk2/Area_Triage/model_list/:/model_list/
+      - /mnt/disk2/huatuogpt-ckpts/huatuo_20240910_qwen1.5_32b_4096-4bit:/model_list/area_format_v10MED_s60000-int4:ro
+      # - /mnt/disk2/huatuogpt-ckpts/huatuo_20240913_qwen1.5_32b_4096-4bit:/model_list/area_format_v10MED_s60000-int4:ro
+      - ${ROOTPATH}/RAG_RES:/RAG_RES
+      - /mnt/disk2/Area_Triage/utils_model:/utils_model
+    env_file:
+      - .env
+    ports:
+      - "12001:5000"
+    # restart: always
+    networks:
+      - cluster_api_default
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["2"] # 指定gpu
+              capabilities: [gpu]
+
+  # 深圳市龙岗区人民医院
+  area-cluter-lgph-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_People_Hospital:/route_server
+    ports:
+      - "21001:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗中心医院
+  area-cluter-lgcenter-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_Center_Hospital:/route_server
+    ports:
+      - "21002:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区第三人民医院
+  area-cluter-lgthird-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_Third_Hospital:/route_server
+    ports:
+      - "21003:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区第四人民医院
+  area-cluter-lgfourth-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_Fourth_Hospital:/route_server
+    ports:
+      - "21004:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区第五人民医院
+  area-cluter-lgfifth-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_Fifth_Hospital:/route_server
+    ports:
+      - "21005:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区第六人民医院
+  area-cluter-lgsixth-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_Sixth_Hospital:/route_server
+    ports:
+      - "21006:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区第二人民医院
+  area-cluter-lgsec-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/LG_Sec_Hospital:/route_server
+    ports:
+      - "21007:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 北京中医药大学深圳医院本部
+  area-cluter-bjzyydxszyybb-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/bjzyydxszyybb:/route_server
+    ports:
+      - "21008:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 北京中医药大学深圳医院园山院区
+  area-cluter-bjzyydxszyyysyq-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/bjzyydxszyyysyq:/route_server
+    ports:
+      - "21009:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区妇幼保健院
+  area-cluter-lgfybjy-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/lgfybjy:/route_server
+    ports:
+      - "21010:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区骨科医院
+  area-cluter-lggkyy-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/lggkyy:/route_server
+    ports:
+      - "21011:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 深圳市龙岗区耳鼻咽喉医院
+  area-cluter-lgebyhyy-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/lgebyhyy:/route_server
+    ports:
+      - "21012:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  # 龙岗区域平台抽象科室
+  area-cluter-abstract-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - BASE_URL=http://61.241.103.33:12001
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/LG_Area_Model_Cluster/abstract-hospital:/route_server
+    ports:
+      - "21013:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  area-cluster-entry-server:
+    image: slim_python_env:0.1
+    restart: always
+    networks:
+      - cluster_api_default
+    environment:
+      - PORT=4000
+    volumes:
+      - ${ROOTPATH}/common-cluster-api:/route_server
+    ports:
+      - "21000:4000"
+    entrypoint: python /route_server/redirect_server.py
+
+  area-cluster-cluster-gptweb:
+    image: yidadaa/chatgpt-next-web:latest
+    restart: always
+    ports:
+      - "20999:8000"
+    environment:
+      - BASE_URL=http://61.241.103.33:21000
+      - PORT=8000
+      - CUSTOM_MODELS=-all,+lg-people-hospital,+lg-center-hospital,+lg-third-hospital,+lg-sec-hospital,+lg-fourth-hospital,+lg-fifth-hospital,+lg-sixth-hospital,+bjzyydxszyybb,+bjzyydxszyybb,+bjzyydxszyyysyq,+lgfybjy,+lggkyy,+lgebyhyy,+abstract-hospital
+    networks:
+      - cluster_api_default
+
+networks:
+  cluster_api_default:
+    driver: bridge
+    name: cluster_api_default
